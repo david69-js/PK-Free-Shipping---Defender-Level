@@ -1,10 +1,35 @@
-query DeliveryInput {
+query Input {
   cart {
+    cost {
+      subtotalAmount {
+        amount
+      }
+    }
     deliveryGroups {
       id
+      deliveryOptions {
+        handle
+        title
+        cost {
+          amount
+        }
+      }
+    }
+   buyerIdentity {
+      customer {
+        id
+        hasTags(tags: [
+          "tier: Defender"
+        ]) {
+          tag
+          hasTag
+        }
+      }
     }
   }
   discount {
-    discountClasses
+    metafield(namespace: "$app", key: "loyalty-defender-level") {
+      jsonValue
+    }
   }
 }

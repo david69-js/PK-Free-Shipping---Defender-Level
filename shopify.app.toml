@@ -14,7 +14,14 @@ api_version = "2026-07"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = ""
+scopes = "read_customers, write_customers, read_discounts, write_discounts read_orders, write_orders, read_shipping, write_shipping"
 
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+
+[discount.metafields.app.loyalty-defender-level]
+type = "json"
+name = "Loyalty Defender Level configuration"
+description = "Loyalty Defender Level discount function."
+access.admin = "merchant_read_write"
+access.storefront = "none"

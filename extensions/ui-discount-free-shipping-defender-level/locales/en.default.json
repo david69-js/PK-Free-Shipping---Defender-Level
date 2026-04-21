@@ -15,6 +15,15 @@
     "order": "Order discount",
     "shipping": "Shipping discount"
   },
+  "tiers": {
+    "title": "Tiers",
+    "juniorRanger": "Junior Ranger",
+    "rangerInTraining": "Ranger In Training",
+    "chiefRanger": "Chief Ranger",
+    "customerTag": "Customer Tag",
+    "minimumSubtotal": "Minimum Subtotal",
+    "shippingDiscountPercent": "Shipping Discount Percent"
+  },
   "error": "Unable to update discount types. Please try again."
 }
 
