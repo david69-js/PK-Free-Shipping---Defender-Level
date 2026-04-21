@@ -3,15 +3,46 @@
     "export": "cart-delivery-options-discounts-generate-run",
     "target": "cart.delivery-options.discounts.generate.run",
     "input": {
-      "discount": {
-        "discountClasses": ["SHIPPING"]
-      },
       "cart": {
         "deliveryGroups": [
           {
-            "id": "gid://shopify/CartDeliveryGroup/1"
+            "id": "gid://shopify/CartDeliveryGroup/1",
+            "deliveryOptions": [
+              {
+                "handle": "standard",
+                "cost": {
+                  "amount": "10.0"
+                }
+              }
+            ]
           }
-        ]
+        ],
+        "cost": {
+          "subtotalAmount": {
+            "amount": "100.0"
+          }
+        },
+        "buyerIdentity": {
+          "customer": {
+            "id": "gid://shopify/Customer/1",
+            "hasTags": [
+              { "tag": "tier: Defender", "hasTag": true }
+            ]
+          }
+        }
+      },
+      "discount": {
+        "metafield": {
+          "jsonValue": {
+            "tiers": [
+              {
+                "customerTag": "tier: Defender",
+                "minimumSubtotal": 50,
+                "shippingDiscountPercent": 100
+              }
+            ]
+          }
+        }
       }
     },
     "output": {
@@ -20,7 +51,7 @@
           "deliveryDiscountsAdd": {
             "candidates": [
               {
-                "message": "FREE DELIVERY",
+                "message": "VIP Customer Reward",
                 "targets": [
                   {
                     "deliveryGroup": {
