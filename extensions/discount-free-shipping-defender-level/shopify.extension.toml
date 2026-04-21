@@ -23,7 +23,3 @@ description = "t:description"
 
 [extensions.ui]
 handle = "ui-discount-free-shipping-defender-level"
-
-[[extensions.metafields]]
-namespace = "$app"
-key = "loyalty-defender-level"

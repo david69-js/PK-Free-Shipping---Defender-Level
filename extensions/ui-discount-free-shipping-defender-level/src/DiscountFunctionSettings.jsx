@@ -14,7 +14,7 @@ function App() {
     () =>
       parseMetafield(
         data?.metafields?.find(
-          metafield => metafield.key === "loyalty-shipping-script",
+          metafield => metafield.key === "free-shipping-defender-level",
         )?.value,
       ),
     [data?.metafields],
@@ -37,7 +37,7 @@ function App() {
     await applyMetafieldChange({
       type: "updateMetafield",
       namespace: "$app",
-      key: "loyalty-defender-level",
+      key: "free-shipping-defender-level",
       value: JSON.stringify({tiers}),
       valueType: "json",
     });
@@ -111,7 +111,7 @@ function parseMetafield(value) {
       tiers:
         parsed.tiers ?? [
           {
-            customerTag: "tier: defender",
+            customerTag: "tier: Defender",
             minimumSubtotal: 0,
             shippingDiscountPercent: 100,
           }
@@ -121,7 +121,7 @@ function parseMetafield(value) {
     return {
       tiers: [
         {
-          customerTag: "tier: defender",
+          customerTag: "tier: Defender",
           minimumSubtotal: 0,
           shippingDiscountPercent: 100,
         }

@@ -13,6 +13,6 @@ target = "admin.discount-details.function-settings.render"
 
 [[extensions.metafields]]
 namespace = "$app"
-key = "function-configuration"
+key = "free-shipping-defender-level"
 
 
