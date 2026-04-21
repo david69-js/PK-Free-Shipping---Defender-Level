@@ -1,6 +1,7 @@
 import {
   DeliveryDiscountSelectionStrategy,
   DeliveryInput,
+  CartDeliveryOption,
   CartDeliveryOptionsDiscountsGenerateRunResult,
 } from "../generated/api";
 
@@ -50,6 +51,14 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
     return {operations: []};
   }
 
+  const standardShippingOptions = firstDeliveryGroup.deliveryOptions.filter(
+    (option: CartDeliveryOption) => option.title === "Standard Shipping",
+  );
+
+  if (standardShippingOptions.length === 0) {
+    return {operations: []};
+  }
+
   return {
     operations: [
       {
@@ -60,13 +69,11 @@ export function cartDeliveryOptionsDiscountsGenerateRun(
                 discountPercent === 100
                   ? "VIP Customer Reward"
                   : `${discountPercent}% off shipping`,
-              targets: [
-                {
-                  deliveryGroup: {
-                    id: firstDeliveryGroup.id,
-                  },
+              targets: standardShippingOptions.map((option: CartDeliveryOption) => ({
+                deliveryOption: {
+                  handle: option.handle,
                 },
-              ],
+              })),
               value: {
                 percentage: {
                   value: discountPercent,
