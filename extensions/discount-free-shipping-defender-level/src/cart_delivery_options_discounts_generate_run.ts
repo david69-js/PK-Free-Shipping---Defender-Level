@@ -4,66 +4,76 @@ import {
   CartDeliveryOptionsDiscountsGenerateRunResult,
 } from "../generated/api";
 
-/**
- * Replicated logic from Ruby Shipping Script:
- * TAG = "tier: Defender"
- * MESSAGE = "VIP Customer Reward"
- * Targets "Standard Shipping" rates and applies 100% discount.
- * 
- * Note: Shopify Shipping Discount functions do not support renaming delivery options via change_name.
- * The message field is used to communicate the discount reward.
- */
+type TierConfig = {
+  customerTag: string;
+  minimumSubtotal: number;
+  shippingDiscountPercent: number;
+};
 
-const TAG = "tier: Defender";
-const MESSAGE = "VIP Customer Reward";
-const TARGET_SHIPPING_NAME = "Standard Shipping";
+type LoyaltyShippingConfig = {
+  tiers: TierConfig[];
+};
 
 export function cartDeliveryOptionsDiscountsGenerateRun(
   input: DeliveryInput,
 ): CartDeliveryOptionsDiscountsGenerateRunResult {
+  const firstDeliveryGroup = input.cart.deliveryGroups[0];
+  if (!firstDeliveryGroup) {
+    return {operations: []};
+  }
+
+  const metafield = input.discount.metafield;
+  if (!metafield || !metafield.jsonValue) {
+    return {operations: []};
+  }
+
+  const config = metafield.jsonValue as LoyaltyShippingConfig;
+  const tiers = config.tiers ?? [];
+
   const customer = input.cart.buyerIdentity?.customer;
-  
-  if (!customer) {
-    return { operations: [] };
+  const hasTags = customer?.hasTags ?? [];
+
+  // Find the first active VIP tier tag the customer has (any hasTag === true)
+  const activeTag = hasTags.find(t => t.hasTag === true);
+
+  if (!activeTag) {
+    // Customer is not logged in or has none of the VIP tier tags
+    return {operations: []};
   }
 
-  // Check if customer has the required tag "tier: Defender"
-  const hasTag = customer.hasTags.find(t => t.tag === TAG && t.hasTag === true);
-  
-  if (!hasTag) {
-    return { operations: [] };
-  }
+  // Look up the discount % for this specific tag from the metafield config.
+  // Falls back to 100% (full free shipping) if no tier config is found — matching the Ruby logic.
+  const matchingTier = tiers.find(tier => tier.customerTag === activeTag.tag);
+  const discountPercent = matchingTier?.shippingDiscountPercent ?? 100;
 
-  // Iterate through delivery groups and find options that match "Standard Shipping"
-  const candidates = input.cart.deliveryGroups.flatMap(deliveryGroup => {
-    return deliveryGroup.deliveryOptions
-      .filter(option => option.title?.includes(TARGET_SHIPPING_NAME))
-      .map(option => ({
-        message: MESSAGE,
-        targets: [
-          {
-            deliveryOption: {
-              handle: option.handle,
-            },
-          },
-        ],
-        value: {
-          percentage: {
-            value: 100, // 100% discount = Free Shipping
-          },
-        },
-      }));
-  });
-
-  if (candidates.length === 0) {
-    return { operations: [] };
+  if (discountPercent <= 0) {
+    return {operations: []};
   }
 
   return {
     operations: [
       {
         deliveryDiscountsAdd: {
-          candidates,
+          candidates: [
+            {
+              message:
+                discountPercent === 100
+                  ? "VIP Customer Reward"
+                  : `${discountPercent}% off shipping`,
+              targets: [
+                {
+                  deliveryGroup: {
+                    id: firstDeliveryGroup.id,
+                  },
+                },
+              ],
+              value: {
+                percentage: {
+                  value: discountPercent,
+                },
+              },
+            },
+          ],
           selectionStrategy: DeliveryDiscountSelectionStrategy.All,
         },
       },
