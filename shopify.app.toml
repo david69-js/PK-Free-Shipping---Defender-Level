@@ -7,7 +7,6 @@ embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2026-07"
@@ -18,3 +17,10 @@ scopes = "read_customers, write_customers, read_discounts, write_discounts, read
 
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+
+[discount.metafields.app.free-shipping-defender-level]
+type = "json"
+name = "Free Shipping Defender Level configuration"
+description = "Free Shipping Defender Level discount function."
+access.admin = "merchant_read_write"
+access.storefront = "none"
